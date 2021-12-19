@@ -44,10 +44,8 @@ function map(array, fn) {
    reduce([1, 2, 3], (all, current) => all + current) // 6
  */
 function reduce(array, fn, initial) {
-  const startValue = initial ? 1 : 2;
-  let lastCallback = initial
-    ? fn(initial, array[0], 0, array)
-    : fn(array[0], array[1], 1, array);
+  const startValue = initial ? 0 : 1;
+  let lastCallback = initial ? initial : array[0];
 
   for (let i = startValue; i < array.length; ++i) {
     lastCallback = fn(lastCallback, array[i], i, array);
@@ -87,8 +85,9 @@ function upperProps(obj) {
  */
 function createProxy(obj) {
   return new Proxy(obj, {
-    get(target, prop) {
-      return target[prop] * target[prop];
+    set(obj, key, value) {
+      obj[key] = value ** 2;
+      return true;
     },
   });
 }
