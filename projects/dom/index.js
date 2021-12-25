@@ -10,7 +10,11 @@
  Пример:
    createDivWithText('loftschool') // создаст элемент div, поместит в него 'loftschool' и вернет созданный элемент
  */
-function createDivWithText(text) {}
+function createDivWithText(text) {
+  const element = document.createElement('div');
+  element.textContent = text;
+  return element;
+}
 
 /*
  Задание 2:
@@ -20,7 +24,9 @@ function createDivWithText(text) {}
  Пример:
    prepend(document.querySelector('#one'), document.querySelector('#two')) // добавит элемент переданный первым аргументом в начало элемента переданного вторым аргументом
  */
-function prepend(what, where) {}
+function prepend(what, where) {
+  where.prepend(what);
+}
 
 /*
  Задание 3:
@@ -41,12 +47,23 @@ function prepend(what, where) {}
 
    findAllPSiblings(document.body) // функция должна вернуть массив с элементами div и span т.к. следующим соседом этих элементов является элемент с тегом P
  */
-function findAllPSiblings(where) {}
+function findAllPSiblings(where, syblingToFind = 'P') {
+  const elementsWithSymbolSiblings = [];
+
+  for (const node of where.childNodes) {
+    if (node.nextSibling && node.nextSibling.nodeName === syblingToFind) {
+      elementsWithSymbolSiblings.push(node);
+    }
+  }
+
+  return elementsWithSymbolSiblings;
+}
 
 /*
  Задание 4:
 
- Функция представленная ниже, перебирает все дочерние узлы типа "элемент" внутри узла переданного в параметре where и возвращает массив из текстового содержимого найденных элементов
+ Функция представленная ниже, перебирает все дочерние узлы типа "элемент" внутри узла переданного в параметре
+ where и возвращает массив из текстового содержимого найденных элементов
  Но похоже, что в код функции закралась ошибка и она работает не так, как описано.
 
  Необходимо найти и исправить ошибку в коде так, чтобы функция работала так, как описано выше.
@@ -63,7 +80,7 @@ function findAllPSiblings(where) {}
 function findError(where) {
   const result = [];
 
-  for (const child of where.childNodes) {
+  for (const child of where.children) {
     result.push(child.textContent);
   }
 
@@ -73,7 +90,8 @@ function findError(where) {
 /*
  Задание 5:
 
- Функция должна перебрать все дочерние узлы элемента переданного в параметре where и удалить из него все текстовые узлы
+ Функция должна перебрать все дочерние узлы элемента переданного в параметре where и удалить из него
+ все текстовые узлы
 
  Задачу необходимо решить без использования рекурсии, то есть можно не уходить вглубь дерева.
  Так же будьте внимательны при удалении узлов, т.к. можно получить неожиданное поведение при переборе узлов
@@ -82,7 +100,13 @@ function findError(where) {
    После выполнения функции, дерево <div></div>привет<p></p>loftchool!!!
    должно быть преобразовано в <div></div><p></p>
  */
-function deleteTextNodes(where) {}
+function deleteTextNodes(where) {
+  for (const node of where.childNodes) {
+    if (node.nodeType === 3) {
+      where.removeChild(node);
+    }
+  }
+}
 
 /*
  Задание 6:
@@ -95,7 +119,18 @@ function deleteTextNodes(where) {}
    После выполнения функции, дерево <span> <div> <b>привет</b> </div> <p>loftchool</p> !!!</span>
    должно быть преобразовано в <span><div><b></b></div><p></p></span>
  */
-function deleteTextNodesRecursive(where) {}
+function deleteTextNodesRecursive(where) {
+  for (let i = 0; i < where.childNodes.length; ++i) {
+    const node = where.childNodes[i];
+
+    if (node.nodeType === 3) {
+      where.removeChild(node);
+      --i;
+    } else if (node.nodeType === Element.ELEMENT_NODE) {
+      deleteTextNodesRecursive(node);
+    }
+  }
+}
 
 /*
  Задание 7 *:
@@ -117,7 +152,28 @@ function deleteTextNodesRecursive(where) {}
      texts: 3
    }
  */
-function collectDOMStat(root) {}
+function collectDOMStat(root) {
+  const classesMap = new Map();
+  const tagsMap = new Map();
+  let texts = 0;
+
+  for (const node of root.children) {
+    if (node.nodeType === 3) {
+      texts++;
+    }
+    const nodeName = node.nodeName;
+
+    if (tagsMap.has(nodeName)) {
+      tagsMap.set(nodeName, tagsMap.get(nodeName) + 1);
+    } else {
+      tagsMap.set(nodeName, 1);
+    }
+  }
+  const classes = Object.fromEntries(classesMap.entries());
+  const tags = Object.fromEntries(tagsMap.entries());
+
+  return { tags, classes, texts };
+}
 
 /*
  Задание 8 *:
