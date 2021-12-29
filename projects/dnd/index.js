@@ -4,7 +4,8 @@
  Создайте страницу с кнопкой.
  При нажатии на кнопку должен создаваться div со случайными размерами, цветом и позицией на экране
  Необходимо предоставить возможность перетаскивать созданные div при помощи drag and drop
- Запрещено использовать сторонние библиотеки. Разрешено пользоваться только тем, что встроено в браузер
+ Запрещено использовать сторонние библиотеки. Разрешено пользоваться только тем,
+ что встроено в браузер
  */
 
 /*
@@ -21,7 +22,15 @@ const homeworkContainer = document.querySelector('#app');
 
 document.addEventListener('mousemove', (e) => {});
 
-export function createDiv() {}
+export function createDiv() {
+  const element = document.createElement('div');
+  element.style.width = '12px';
+  element.style.height = '100px';
+  element.style.background = 'red';
+  element.style.top = '10px';
+  element.style.left = '20px';
+  return element;
+}
 
 const addDivButton = homeworkContainer.querySelector('#addDiv');
 
