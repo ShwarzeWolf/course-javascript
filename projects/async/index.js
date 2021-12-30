@@ -30,6 +30,7 @@
  */
 
 import './towns.html';
+import { loadAndSortTowns } from './functions';
 
 const homeworkContainer = document.querySelector('#app');
 
@@ -39,7 +40,9 @@ const homeworkContainer = document.querySelector('#app');
  Массив городов пожно получить отправив асинхронный запрос по адресу
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
-function loadTowns() {}
+function loadTowns() {
+  return loadAndSortTowns();
+}
 
 /*
  Функция должна проверять встречается ли подстрока chunk в строке full
@@ -52,7 +55,9 @@ function loadTowns() {}
    isMatching('Moscow', 'SCO') // true
    isMatching('Moscow', 'Moscov') // false
  */
-function isMatching(full, chunk) {}
+function isMatching(full, chunk) {
+  return full.toUpperCase().includes(chunk.toUpperCase());
+}
 
 /* Блок с надписью "Загрузка" */
 const loadingBlock = homeworkContainer.querySelector('#loading-block');
@@ -67,8 +72,56 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 /* Блок с результатами поиска */
 const filterResult = homeworkContainer.querySelector('#filter-result');
 
-retryButton.addEventListener('click', () => {});
+let towns = [];
+function loadInfoToPage() {
+  loadingBlock.hidden = false;
+  retryButton.hidden = true;
+  loadingFailedBlock.hidden = true;
+  filterBlock.hidden = true;
+  filterResult.hidden = true;
 
-filterInput.addEventListener('input', function () {});
+  loadTowns()
+    .then((recievedTowns) => {
+      loadingBlock.hidden = true;
+      filterBlock.hidden = false;
+      filterResult.hidden = false;
+      towns = recievedTowns;
+    })
+    .catch(() => {
+      loadingBlock.hidden = true;
+      retryButton.hidden = false;
+      filterBlock.hidden = true;
+      filterResult.hidden = true;
+      loadingFailedBlock.hidden = false;
+    });
+}
+
+function updateFilter(townToSearch) {
+  filterResult.innerHTML = '';
+
+  if (!townToSearch) return;
+
+  const fragment = document.createDocumentFragment();
+
+  for (const town of towns) {
+    if (isMatching(town.name, townToSearch)) {
+      const townElement = document.createElement('div');
+      townElement.textContent = town.name;
+      fragment.append(townElement);
+    }
+  }
+
+  filterResult.append(fragment);
+}
+
+loadInfoToPage();
+
+retryButton.addEventListener('click', () => {
+  loadInfoToPage();
+});
+
+filterInput.addEventListener('input', function () {
+  updateFilter(this.value);
+});
 
 export { loadTowns, isMatching };
